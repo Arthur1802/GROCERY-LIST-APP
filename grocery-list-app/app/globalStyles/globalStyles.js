@@ -1,8 +1,11 @@
-import { StyleSheet } from 'react-native'
-import { Colors } from '../../constants/Colors'
+import { StyleSheet, useColorScheme } from 'react-native'
 
 export const getPlaceholderTextColor = (theme) => {
     return theme === 'light' ? 'grey' : '#aaa'
+}
+
+const getTheme = () => {
+    return useColorScheme() || 'light'
 }
 
 const styles = StyleSheet.create({
@@ -29,14 +32,15 @@ const styles = StyleSheet.create({
         fontFamily: 'poppins-regular',
     },
     button: {
-        width: 200,
+        width: 300,
         height: 50,
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         textAlign: 'center',
         borderRadius: 10,
+        gap: 10,
     },
     primaryBtn: {
         backgroundColor: '#03bb85',

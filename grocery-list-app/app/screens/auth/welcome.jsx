@@ -9,8 +9,8 @@ export default function WelcomeScreen() {
 
     return (
         <Div>
-            <View style = {[styles.container, {paddingTop: '20%'}]}>
-                <Text style = {styles.title}>Bem-vindo(a) à Lista de Compras Mobile</Text>
+            <View style = {[styles.container, {paddingTop: '50%'}]}>
+                <Text style = {[styles.title, {marginBottom: '20%'}]}>Bem-vindo(a) à Lista de Compras Mobile</Text>
 
                 <TouchableOpacity style = {[styles.button, styles.primaryBtn]} onPress = {() => navigation.navigate('login')}>
                     <Text style = {styles.primaryBtn.primaryBtnText}>Começar</Text>
