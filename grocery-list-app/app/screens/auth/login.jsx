@@ -1,4 +1,4 @@
-import { View, TextInput, TouchableOpacity } from 'react-native'
+import { View, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { ThemedText as Text } from '../../../components/ThemedText'
 import { ThemedView as Div } from '../../../components/ThemedView'
 import Separator from '../../../components/Separator'
@@ -14,24 +14,28 @@ export default function LoginScreen() {
     const theme = useColorScheme() || 'light'
     const navigation = useNavigation()
 
+    const [loading, setLoading] = useState(false)
     const [values, setValues] = useState({
         email: '',
         password: ''
     })
 
     const handleInputChange = (field, value) => {
-        setValues({
-            ...values,
-            [field]: value
-        })
+        setValues((prev) => ({ ...prev, [field]: value }))
     }
 
     const handleSubmit = async () => {
-        if (!values.email || !values.password) {
+        if (loading) return
+        setLoading(true)
+
+        const { email, password } = values
+
+        if (!email || !password) {
             Toast.show({
                 type: 'error',
-                text1: 'Preencha todos os campos'
+                text1: 'Preencha todos os campos.'
             })
+            setLoading(false)
             return
         }
 
@@ -40,31 +44,42 @@ export default function LoginScreen() {
             setTimeout(() => {
                 if (result) {
                     navigation.navigate('main')
+                } else {
+                    throw new Error('Erro desconhecido ao fazer login.')
                 }
-            }, 1000)
+            }, 5000)
         } catch (error) {
-            Toast.show({
-                type: 'error',
-                text1: 'Erro ao fazer login',
-                text2: `${error.code}\n${error.message}`
-            })
+            setTimeout(() => {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Erro ao fazer login.',
+                    text2: error.message
+                })
+            }, 15000)
+        } finally {
+            setLoading(false)
         }
     }
 
     const handleLoginWithGoogle = async () => {
+        if (loading) return
+        setLoading(true)
+
         try {
-            const result = await LoginWithGoogle() 
-            setTimeout(() => {
-                if (result) {
-                    navigation.navigate('main')
-                }
-            }, 1000)
+            const result = await LoginWithGoogle()
+            if (result) {
+                navigation.navigate('main')
+            } else {
+                throw new Error('Erro desconhecido com o Google.')
+            }
         } catch (error) {
             Toast.show({
                 type: 'error',
-                text1: 'Erro ao fazer login com Google',
-                text2: `${error.code}\n${error.message}`
+                text1: 'Erro ao fazer login com Google.',
+                text2: error.message
             })
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -74,32 +89,35 @@ export default function LoginScreen() {
                 <Text style = {styles.title}>Login</Text>
 
                 <TextInput
-                    style = {[styles.input, {borderColor: theme === 'light' ? '#aaa': 'grey'}]}
-                    placeholder = 'Email'
+                    style = {[styles.input, { borderColor: theme === 'light' ? '#aaa' : 'grey' }]}
+                    placeholder = "Email"
                     placeholderTextColor = {getPlaceholderTextColor(theme)}
-                    onChangeText = {text => handleInputChange('email', text)}
+                    onChangeText = {(text) => handleInputChange('email', text)}
+                    value = {values.email}
+                    autoCapitalize = "none"
                 />
-                
+
                 <TextInput
-                    style = {[styles.input, {borderColor: theme === 'light' ? '#aaa' : 'grey'}]}
-                    placeholder = 'Password'
+                    style = {[styles.input, { borderColor: theme === 'light' ? '#aaa' : 'grey' }]}
+                    placeholder = "Password"
                     placeholderTextColor = {getPlaceholderTextColor(theme)}
-                    secureTextEntry = {true}
-                    onChangeText = {text => handleInputChange('password', text)}
+                    secureTextEntry
+                    onChangeText = {(text) => handleInputChange('password', text)}
+                    value = {values.password}
                 />
 
-                <TouchableOpacity style = {[styles.button, styles.primaryBtn]} onPress = {() => navigation.navigate('main')}>
-                    <Text style = {styles.primaryBtn.btnText}>Login</Text>
+                <TouchableOpacity style = {[styles.button, styles.primaryBtn]} onPress = {handleSubmit} disabled = {loading}>
+                    {loading ? (
+                        <ActivityIndicator color={theme === 'dark' ? '#fff' : '#000'} />
+                    ) : (
+                        <Text style = {styles.primaryBtn.btnText}>Login</Text>
+                    )}
                 </TouchableOpacity>
-                
-                {/* <TouchableOpacity style = {[styles.button, styles.primaryBtn]} onPress = {handleSubmit}>
-                    <Text style = {styles.primaryBtn.btnText}>Login</Text>
-                </TouchableOpacity> */}
 
-                {/* <TouchableOpacity style = {[styles.button, styles.primaryBtn]} onPress = {handleLoginWithGoogle}>
-                    <Ionicons name = 'logo-google' size = {24} color = 'white' />
+                <TouchableOpacity style =  {[styles.button, styles.primaryBtn]} onPress =  {handleLoginWithGoogle} disabled =  {loading}>
+                    <Ionicons name = "logo-google" size = {24} color = "white" />
                     <Text style = {styles.primaryBtn.btnText}>Continue with Google</Text>
-                </TouchableOpacity> */}
+                </TouchableOpacity>
 
                 <Separator />
 

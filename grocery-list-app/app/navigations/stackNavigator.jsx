@@ -11,7 +11,7 @@ import Main from './tabLayout'
 import Profile from '../screens/profile'
 import Ionicons from '@expo/vector-icons/Ionicons'
 
-export default function StackNavigator() {
+export default function StackNavigator(promptAsync, initialRoute) {
     const navigation = useNavigation()
 
     return (
@@ -29,7 +29,7 @@ export default function StackNavigator() {
                 ),
                 animation: 'slide_from_right'
             }}
-            initialRoute = 'welcome'
+            initialRoute = {initialRoute}
         >
             <Stack.Screen
                 name = "welcome"
@@ -48,6 +48,7 @@ export default function StackNavigator() {
             <Stack.Screen
                 name = "signin"
                 component = {SigninScreen}
+                initialParams = {promptAsync}
             />
             
             <Stack.Screen
